@@ -3,23 +3,24 @@
 
 (
   # \COPY opendata_projects FROM PSTDIN WITH CSV HEADER
-  cat donorschoose-org-1apr2011-v1-projects.csv
+  zcat 04-open_data-projects.csv.gz
   echo '\.'
 
   # \COPY opendata_resources FROM PSTDIN WITH CSV HEADER
-  cat donorschoose-org-1apr2011-v1-resources.csv
+  zcat 05-open_data-resources.csv.gz
   echo '\.'
 
   # \COPY opendata_essays FROM PSTDIN WITH CSV HEADER
-  cat donorschoose-org-1apr2011-v1-essays.csv
+  zcat 02-open_data-essays.csv.gz
   echo '\.'
 
   # \COPY opendata_donations FROM PSTDIN WITH CSV HEADER
-  cat donorschoose-org-1apr2011-v1-donations.csv
+  zcat 01-open_data-donations.csv.gz
   echo '\.'
 
   # \COPY opendata_giftcards FROM PSTDIN WITH CSV HEADER
-  cat donorschoose-org-1apr2011-v1-giftcards.csv
+  zcat 03-open_data-giftcards.csv.gz
   echo '\.'
 ) \
-| psql -U $DBUSER -h $DBHOST -d $DBNAME -f donorschoose-org-1apr2011-load-script.sql
+| psql -U $DBUSER -h $DBHOST -d $DBNAME -f load.sql
+psql -U $DBUSER -h $DBHOST -d $DBNAME -f normalize.sql
