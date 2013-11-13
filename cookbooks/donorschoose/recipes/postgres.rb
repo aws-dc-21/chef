@@ -34,9 +34,6 @@ end
 #  end
 #end
 
-execute "sudo -u postgres sh -c 'createuser root'"
-execute "sudo -u postgres sh -c 'createuser app'"
-
 cookbook_file '/root/load.sh' do
   source 'load.sh'
   mode 0775
