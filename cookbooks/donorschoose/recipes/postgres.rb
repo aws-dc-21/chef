@@ -26,13 +26,16 @@ postgresql_database 'donorschoose' do
   action :create
 end
 
-node['postgres']['users'].each do |user, opts|
-  postgresql_database_user user do
-    connection    postgresql_connection_info
-    password      opts[:password]
-    action        :create
-  end
-end
+#node['postgres']['users'].each do |user, opts|
+#  postgresql_database_user user do
+#    connection    postgresql_connection_info
+#    password      opts[:password]
+#    action        :create
+#  end
+#end
+
+execute "sudo -u postgres sh -c 'createuser root'"
+execute "sudo -u postgres sh -c 'createuser app'"
 
 cookbook_file '/root/load.sh' do
   source 'load.sh'
