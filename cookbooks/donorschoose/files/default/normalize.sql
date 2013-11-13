@@ -1,14 +1,18 @@
-DROP TABLE normalized_giftcard;
-DROP TABLE normalized_donation;
-DROP TABLE normalized_project;
-DROP TABLE normalized_school;
-DROP TABLE normalized_teacher;
-DROP TABLE normalized_account;
-DROP TABLE normalized_city;
-DROP TABLE normalized_essay;
-DROP TABLE normalized_resource;
+                                                                     
+                                                                     
+                                                                     
+                                             
+DROP TABLE IF EXISTS normalized_giftcard CASCADE;
+DROP TABLE IF EXISTS normalized_donation CASCADE;
+DROP TABLE IF EXISTS normalized_project CASCADE;
+DROP TABLE IF EXISTS normalized_school CASCADE;
+DROP TABLE IF EXISTS normalized_teacher CASCADE;
+DROP TABLE IF EXISTS normalized_account CASCADE;
+DROP TABLE IF EXISTS normalized_city CASCADE;
+DROP TABLE IF EXISTS normalized_essay CASCADE;
+DROP TABLE IF EXISTS normalized_resource CASCADE;
 
-DROP SEQUENCE rownum;
+DROP SEQUENCE IF EXISTS rownum;
 
 \qecho
 \qecho NORMALIZE CITIES ...
@@ -443,7 +447,7 @@ INSERT INTO normalized_project
   primary_focus_area,
   secondary_focus_subject,
   secondary_focus_area,
-  resource_usage,
+  -- Not in CSV: resource_usage,
   resource_type,
   poverty_level,
   grade_level,
@@ -454,7 +458,7 @@ INSERT INTO normalized_project
   total_price_excluding_optional_support,
   total_price_including_optional_support,
   students_reached,
-  used_by_future_students,
+  -- Not in CSV: used_by_future_students,
   total_donations,
   num_donors,
   eligible_double_your_impact_match,
@@ -473,7 +477,7 @@ select
   primary_focus_area,
   secondary_focus_subject,
   secondary_focus_area,
-  resource_usage,
+  -- Not in CSV: resource_usage,
   resource_type,
   poverty_level,
   grade_level,
@@ -484,7 +488,7 @@ select
   total_price_excluding_optional_support,
   total_price_including_optional_support,
   students_reached,
-  used_by_future_students,
+  -- Not in CSV: used_by_future_students,
   total_donations,
   num_donors,
   eligible_double_your_impact_match,
@@ -572,11 +576,14 @@ select
   thank_you_packet_mailed
 from donorschoose_donations;
 
-ALTER TABLE normalized_donation
-      ADD CONSTRAINT pk_normalized_donation PRIMARY KEY(_donationid);
+
+-- Doesn't work - multiple records with same _donationid
+-- ALTER TABLE normalized_donation
+--      ADD CONSTRAINT pk_normalized_donation PRIMARY KEY(_donationid);
 
 VACUUM ANALYZE normalized_donation;
 
+-- Doesn't work - get violations
 ALTER TABLE normalized_donation ADD CONSTRAINT FK_donation_project
   FOREIGN KEY (_projectid) REFERENCES normalized_project (_projectid);
 
@@ -629,8 +636,9 @@ select
   _redeemed_cartid
 from donorschoose_giftcards;
 
-ALTER TABLE normalized_giftcard
-      ADD CONSTRAINT pk_normalized_giftcard PRIMARY KEY(_giftcardid);
+-- Doesn't work - multiple records with same _donationid
+-- ALTER TABLE normalized_giftcard
+--       ADD CONSTRAINT pk_normalized_giftcard PRIMARY KEY(_giftcardid);
 
 VACUUM ANALYZE normalized_giftcard;
 
@@ -687,8 +695,9 @@ ALTER TABLE normalized_essay
 
 VACUUM ANALYZE normalized_essay;
 
-ALTER TABLE normalized_essay ADD CONSTRAINT FK_essay_project
-  FOREIGN KEY (_projectid) REFERENCES normalized_project (_projectid);
+-- Doesn't work - get violations
+-- ALTER TABLE normalized_essay ADD CONSTRAINT FK_essay_project
+--   FOREIGN KEY (_projectid) REFERENCES normalized_project (_projectid);
 
 
 
@@ -699,7 +708,7 @@ CREATE TABLE normalized_resource
 (
   _resourceid text NOT NULL,
   _projectid text NOT NULL,
-  vendorid integer,
+  vendorid text,
   vendor_name text,
   project_resource_type text,
   item_name text,

@@ -1,8 +1,12 @@
-DROP TABLE donorschoose_resources;
-DROP TABLE donorschoose_donations;
-DROP TABLE donorschoose_essays;
-DROP TABLE donorschoose_projects;
-DROP TABLE donorschoose_giftcards;
+                                                                     
+                                                                     
+                                                                     
+                                             
+DROP TABLE IF EXISTS donorschoose_resources;
+DROP TABLE IF EXISTS donorschoose_donations;
+DROP TABLE IF EXISTS donorschoose_essays;
+DROP TABLE IF EXISTS donorschoose_projects;
+DROP TABLE IF EXISTS donorschoose_giftcards;
 
 \qecho
 \qecho LOAD PROJECTS TABLE ...
@@ -43,7 +47,7 @@ CREATE TABLE donorschoose_projects
   primary_focus_area text,
   secondary_focus_subject text,
   secondary_focus_area text,
-  resource_usage text,
+  -- NOT IN CSV resource_usage text,
   resource_type text,
   poverty_level text,
   grade_level text,
@@ -55,12 +59,13 @@ CREATE TABLE donorschoose_projects
   fulfillment_labor_materials numeric(10,2),
   total_price_excluding_optional_support numeric(10,2),
   total_price_including_optional_support numeric(10,2),
-  students_reached integer,
-  used_by_future_students boolean,
+  -- Data presents in decimal form: students_reached integer,
+  students_reached numeric(10,2),
+  -- NOT IN CSV used_by_future_students boolean,
 
   -- Project Donations
   total_donations numeric(10,2),
-  num_donors integer,
+  num_donors numeric(10,2),
   eligible_double_your_impact_match boolean,
   eligible_almost_home_match boolean,
 
@@ -87,7 +92,8 @@ CREATE TABLE donorschoose_resources
   _resourceid text NOT NULL,
   _projectid text NOT NULL,
 
-  vendorid integer,
+  -- Data presents as decimal: vendorid integer,
+  vendorid text,
   vendor_name text,
 
   project_resource_type text,
@@ -148,6 +154,9 @@ CREATE TABLE donorschoose_donations
 
   -- Donation Times and Amounts
   donation_timestamp timestamp without time zone,
+  donation_to_project text,				-- Not in original
+  donation_optional_support text,			-- Not in original
+  donation_total text,					-- Not in original
   dollar_amount text,
   donation_included_optional_support boolean,
 
@@ -156,11 +165,13 @@ CREATE TABLE donorschoose_donations
   payment_included_acct_credit boolean,
   payment_included_campaign_gift_card boolean,
   payment_included_web_purchased_gift_card boolean,
+  payment_was_promo_matched boolean,			-- Not in original
 
   ---Donation Types
   via_giving_page boolean,
   for_honoree boolean,
-  thank_you_packet_mailed boolean
+  thank_you_packet_mailed boolean,
+  donation_message text					-- Not in original
 )
 WITHOUT OIDS;
 
@@ -193,7 +204,12 @@ CREATE TABLE donorschoose_giftcards
 
   redeemed boolean,
   date_redeemed date,
-  _redeemed_cartid text
+  _redeemed_cartid text,
+  payment_method text,					-- Not in original
+  payment_included_acct_credit boolean,			-- Not in original
+  payment_included_campaign_gift_card boolean,		-- Not in original
+  payment_included_web_purchased_gift_card boolean,	-- Not in original
+  payment_was_promo_matched boolean			-- Not in original
 )
 WITHOUT OIDS;
 
@@ -262,8 +278,10 @@ ALTER TABLE donorschoose_essays ADD CONSTRAINT FK_donorschoose_essays_projects
 
 \qecho
 \qecho ALTER DONATIONS TABLE ...
-ALTER TABLE donorschoose_donations
-      ADD CONSTRAINT pk_donorschoose_donations PRIMARY KEY(_donationid);
+
+-- Doesn't work - multiple records with same _donationid
+-- ALTER TABLE donorschoose_donations
+--      ADD CONSTRAINT pk_donorschoose_donations PRIMARY KEY(_donationid);
 
 CREATE INDEX donorschoose_donations_donor_acctid
   ON donorschoose_donations
@@ -290,8 +308,9 @@ ALTER TABLE donorschoose_donations ADD CONSTRAINT FK_donorschoose_donations_proj
 
 \qecho
 \qecho ALTER GIFTCARDS TABLE ...
-ALTER TABLE donorschoose_giftcards
-      ADD CONSTRAINT pk_donorschoose_giftcards PRIMARY KEY(_giftcardid);
+-- Doesn't work - multiple records with same _giftcardid
+-- ALTER TABLE donorschoose_giftcards
+--      ADD CONSTRAINT pk_donorschoose_giftcards PRIMARY KEY(_giftcardid);
 
 CREATE INDEX donorschoose_giftcards_buyer_acctid
   ON donorschoose_giftcards
